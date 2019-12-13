@@ -12,6 +12,11 @@ datasets: folder containing the data used
 - index.html : main file for visualising 
 - index.js : main file for code (I guess)
 
-##TODO 
-- [ ] Search data
+## TODO 
+- [x] Search data
+- [ ] WorldMap
+    - [ ] transition
 - [ ] Conquer the world 
+
+## Use of 
+- http://bl.ocks.org/micahstubbs/8e15870eb432a21f0bc4d3d527b2d14f

@@ -1,16 +1,55 @@
+//import * as d3 from 'd3'; 
+//import d3Tip from "d3-tip";
 
-let width = 800
-let height = 400
-const svg = d3.select("body").append("svg").attr("width", width).attr("height", height);
 
+//const t = svg.transition().duration(750)
+//let width = 800
+//let height = 400
+//const svg = d3.select("body").append("svg").attr("width", width).attr("height", height);
 const MARGIN = 80
 let maxTextLength = 100
 const angleDegrees = -45
 const angleRadians = angleDegrees * (Math.PI / 180)
 const padding = 100
-const t = svg.transition().duration(750)
+
+// Set tooltips
+/*
+var tip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-10, 0])
+            .html(function(d) {
+              return "<strong>Country: </strong><span class='details'>" + d.properties.name + "<br></span>" + "<strong>Population: </strong><span class='details'>" + format(d.population) +"</span>";
+            })
+*/
+var margin = {top: 0, right: 0, bottom: 0, left: 0},
+            width = 960 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+           
+var color = d3.scaleThreshold()
+    .domain([10000,100000,500000,1000000,5000000,10000000,50000000,100000000,500000000,1500000000])
+    .range(["rgb(247,251,255)", "rgb(222,235,247)", "rgb(198,219,239)", "rgb(158,202,225)", "rgb(107,174,214)", "rgb(66,146,198)","rgb(33,113,181)","rgb(8,81,156)","rgb(8,48,107)","rgb(3,19,43)"]);
 
 
+
+var path = d3.geoPath();
+
+var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append('g')
+            .attr('class', 'map');
+
+var projection = d3.geoMercator()
+                   .scale(130)
+                  .translate( [width / 2, height / 1.5]);
+
+var path = d3.geoPath().projection(projection);
+
+//svg.call(tip);
+
+
+/*
 d3.csv("https://mjlobo.github.io/teaching/infovis/data/trajets.csv").then(function(trajet) {
     d3.csv("https://mjlobo.github.io/teaching/infovis/data/retards.csv").then(function(retard){
         
@@ -23,8 +62,83 @@ d3.csv("https://mjlobo.github.io/teaching/infovis/data/trajets.csv").then(functi
         })
     })
  })
+})*/
+
+
+//chargement des données 
+d3.csv("https://raw.githubusercontent.com/Kzamania/d3-visual/master/datasets/meat-production-tonnes.csv").then( function (meat) {
+    d3.json("https://raw.githubusercontent.com/jdamiani27/Data-Visualization-and-D3/master/lesson4/world_countries.json").then (function(countries){
+        //meetPerYear(meat);
+        ready(countries,meat);
+    })
+//Entity,Code,Year,total  
+//console.log(data);
 })
 
+d3.csv("https://raw.githubusercontent.com/Kzamania/d3-visual/master/datasets/meat-supply-per-person.csv").then (function (datata) {
+    //console.log(data);
+})
+
+
+
+function ready(data, meat) {
+    var populationById = {};
+    var year = {};
+    var id = {};
+    let meatPerYear = d3.nest()
+    .key(function(d) { return d.Code; })
+    .key(function(d) { return d.Year})
+    .entries(meat);
+
+    meatPerYear.forEach(function (d) { id[d.values[0].values[0].Code] = d.values[0].values[0] });
+    console.log(id);
+    //meatPerYear.forEach(function (d) {console.log(d.values[0].values[0]) } );
+    //console.log(meatPerYear);
+    //meat.forEach(function(d) { populationById[d.code] = +d.population; });
+    //console.log(populationById);
+    //data.features.forEach(function(d) { d.population = populationById[d.id] });
+    //console.log(data.features);
+
+
+    svg.append("g")
+        .attr("class", "countries")
+      .selectAll("path")
+        .data(data.features)
+      .enter().append("path")
+        .attr("d", path)
+        .style("fill", function(d) { return color(50000000); })
+        //.style("fill", function(d) { return color(populationById[d.id]); })
+        .style('stroke', 'white')
+        .style('stroke-width', 1.5)
+        .style("opacity",0.8)
+        // tooltips
+         /* .style("stroke","white")
+          .style('stroke-width', 0.3)
+          .on('mouseover',function(d){
+            tip.show(d);
+  
+            d3.select(this)
+              .style("opacity", 1)
+              .style("stroke","white")
+              .style("stroke-width",3);
+          })
+          .on('mouseout', function(d){
+            tip.hide(d);
+  
+            d3.select(this)
+              .style("opacity", 0.8)
+              .style("stroke","white")
+              .style("stroke-width",0.3);
+          });
+  */
+    svg.append("path")
+        .datum(topojson.mesh(data.features, function(a, b) { return a.id !== b.id; }))
+         // .datum(topojson.mesh(data.features, function(a, b) { return a !== b; }))
+        .attr("class", "names")
+        .attr("d", path);
+
+  }
+  
 
 
 
@@ -72,15 +186,61 @@ function dataLoaded(trajets,retards,emissions,aeroports){
             //console.log(d);
         })
     console.log(aeroports);
-    
+}
 
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ /*   
 co2PerYear = d3.nest()
   .key(function(d) { return d.annee; })
   .rollup(function(v) { return d3.sum(v, function(d) { return d.CO2; }); })
   .entries(emissions);
     
 console.log(co2PerYear)
+*/
 /*co2PerYearPerAirport = d3.nest()
   .key(function(d) {return d.APT})
   .key(function(d) { return d.annee;})
@@ -88,7 +248,7 @@ console.log(co2PerYear)
   .entries(emissions);
   */
   
-}
+
                       
                      
 /*co2PerYear = d3.nest()
