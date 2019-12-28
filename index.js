@@ -82,23 +82,66 @@ d3.csv("https://raw.githubusercontent.com/Kzamania/d3-visual/master/datasets/mea
 
 
 function ready(data, meat) {
-    var populationById = {};
+    let totalMeatPerYear = {};
     var year = {};
-    var id = {};
-    let meatPerYear = d3.nest()
+    //var id = {};
+    /*let meatPerYear = d3.nest()
     .key(function(d) { return d.Code; })
     .key(function(d) { return d.Year})
-    .entries(meat);
+    .entries(meat);*/
 
-    meatPerYear.forEach(function (d) { id[d.values[0].values[0].Code] = d.values[0].values[0] });
-    console.log(id);
+    /*let meatPerYear = d3.nest()
+    .key(function(d) { return d.Year; })
+    .key(function(d) { return d.Code})
+    //.key (d => {return d.total})
+    .entries(meat)*/
+
+    let meatPerYear = d3.groups( meat,
+        d => d.Code,
+        //d => d.Year,
+        );
+
+    var year = 2014;
+    //meatPerYear[0][1] = année
+    /* 
+        d[0] = code
+        d[1] =  array
+        d[1][0] = data array
+        d[1][0][0] = code 
+        d[1][0][1][0] = total array
+        d[1][0][1][0][0] = total 
+    */
+    
+    //meatPerYear.forEach(d => console.log(d));
+    //meatPerYear.forEach(d => totalMeatPerYear[d.key] = d);
+    meatPerYear.forEach(d => {
+        totalMeatPerYear[d[0]] = d,
+        //console.log(d);
+    });
+    //meatPerYear.forEach(function (d) { id[d.values[0].values[0].Code] = d.values[0].values[0] });
+    //console.log(totalMeatPerYear['ATM'] != undefined )
+    //[1].find(d => d.Year == year).total );
+    //meatPerYear.forEach(function (d) { year[d.values[0].values[0].Code] = d.values[0].values[0] });
+
+    //meatPerYear.forEach(function (d) {d.find } );
     //meatPerYear.forEach(function (d) {console.log(d.values[0].values[0]) } );
     //console.log(meatPerYear);
-    //meat.forEach(function(d) { populationById[d.code] = +d.population; });
-    //console.log(populationById);
-    //data.features.forEach(function(d) { d.population = populationById[d.id] });
+    //meat.forEach(function(d) { totalMeatPerYear[d.code] = +d.population; });
+    //console.log(totalMeatPerYear);
+    //data.features.forEach(function(d) { d.population = totalMeatPerYear[d.id][1].find(d => d.Year == year).total });
     //console.log(data.features);
+    //data.features.forEach(d => console.log(d.id));
 
+    //récuperer le minimum / maximum de chaque pays .
+    var min, max = 0;
+    //totalMeatPerYear.forEach(d => console.log(d));
+    //interpolateOrRd / schemeOrRd
+    var hue = d3.scaleSequential(d3.interpolateOrRd).domain([0,1000,10000,250000,500000,1000000,25000000,5000000,75000000,10000000,25000000,50000000,100000000]);
+    //var hue = d3.scaleSequential(d3.interpolateOrRd).domain([0,1000,10000,100000000]); 
+    //var hue = d3.scaleOrdinal(d3.schemeOrRd).domain([0,1000,10000,250000,500000,1000000,25000000,5000000,75000000,10000000,25000000,50000000,100000000]);
+    //console.log([10]);
+
+    //normalized = (x-1000)/(100000000-1000)));
 
     svg.append("g")
         .attr("class", "countries")
@@ -106,8 +149,20 @@ function ready(data, meat) {
         .data(data.features)
       .enter().append("path")
         .attr("d", path)
-        .style("fill", function(d) { return color(50000000); })
-        //.style("fill", function(d) { return color(populationById[d.id]); })
+        //.style("fill", function(d) { return color(50000000); })
+        .style("fill", function(d) { 
+            var total = 0 ;
+            //console.log("id = " + d.id)
+           if (totalMeatPerYear[d.id]  != undefined){
+                if (totalMeatPerYear[d.id][1].find(d => d.Year == year) != undefined){
+                    total = totalMeatPerYear[d.id][1].find(d => d.Year == year).total;
+                }
+           }
+           else total = 0;
+           var normalized = (total-1000)/(100000000-1000);
+          //console.log("total = "+ total + " normalized = "+ normalized + " hue = "+ hue(normalized));
+           return hue(normalized);}
+        )
         .style('stroke', 'white')
         .style('stroke-width', 1.5)
         .style("opacity",0.8)

@@ -14,7 +14,8 @@ datasets: folder containing the data used
 
 ## TODO 
 - [x] Search data
-- [ ] WorldMap
+- [x] WorldMap
+    - [ ] color /!\
     - [ ] transition
 - [ ] Conquer the world 
 
