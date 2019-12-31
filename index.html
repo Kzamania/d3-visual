@@ -5,16 +5,31 @@
         <link href="/d3-geomap/d3-geomap.css" rel="stylesheet">
     </head>
     <body>
+    <div id="title">
+        <h1>Meat production</h1>
+        <span id="range">1961</span>
+    </div>
     <div>
         <!--<button id="play">Play</button>-->
 
     </div>   
-    <div id="svg"></div>
+    <div id="map"></div>
+   <!--<div class="row align-items-center">
+        <div class="col-sm-2"><p id="value-time"></p></div>
+        <div class="col-sm"><div id="slider-time"></div></div>
+    </div>--> 
+    <div id="sliderContainer">
+        <input id="timeslide" type="range" min="0" max="53" value="0" step="1"/><br>
+        
+    </div>
+    <div id="legend"></div>
     </body>
     <script src="http://d3js.org/d3.v5.min.js"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://d3js.org/queue.v1.min.js"></script>
     <script src="https://d3js.org/topojson.v1.min.js"></script>
     <script src="https://d3js.org/d3-array.v2.min.js"></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
+    <script src=https://cdnjs.com/libraries/d3-legend></script>
     <script src="index.js"></script>
 </html>

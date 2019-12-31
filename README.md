@@ -15,9 +15,14 @@ datasets: folder containing the data used
 ## TODO 
 - [x] Search data
 - [x] WorldMap
-    - [ ] color /!\
-    - [ ] transition
+    - [x] color /!\
+    - [ ] transition ?
+- [ ] Legende
+    - Faire un axis en "block" de couleur comme l'exemple de meat and dairy production
+    - arriver à avoir la legende en dessous de la carte, pareil pour le slider des années
+    - afficher la consomation globale par année, comparer avec la production de CO2
 - [ ] Conquer the world 
 
 ## Use of 
 - http://bl.ocks.org/micahstubbs/8e15870eb432a21f0bc4d3d527b2d14f
+- https://bl.ocks.org/duspviz-mit/57c15198c563f7f82f77eed0536eb78c

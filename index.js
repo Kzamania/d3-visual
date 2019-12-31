@@ -12,9 +12,11 @@ const angleDegrees = -45
 const angleRadians = angleDegrees * (Math.PI / 180)
 const padding = 100
 
+let domainValue = [0,1000,10000,20000,250000,500000,1000000,25000000,5000000,75000000,10000000,25000000,50000000,100000000];
+
 // Set tooltips
-/*
-var tip = d3.tip()
+
+/*var tip = d3.tip()
             .attr('class', 'd3-tip')
             .offset([-10, 0])
             .html(function(d) {
@@ -45,6 +47,7 @@ var projection = d3.geoMercator()
                   .translate( [width / 2, height / 1.5]);
 
 var path = d3.geoPath().projection(projection);
+
 
 //svg.call(tip);
 
@@ -83,7 +86,9 @@ d3.csv("https://raw.githubusercontent.com/Kzamania/d3-visual/master/datasets/mea
 
 function ready(data, meat) {
     let totalMeatPerYear = {};
-    var year = {};
+    var years = d3.range(1961,2015,1);
+    var year = 1961;
+    console.log(year);
     //var id = {};
     /*let meatPerYear = d3.nest()
     .key(function(d) { return d.Code; })
@@ -101,7 +106,7 @@ function ready(data, meat) {
         //d => d.Year,
         );
 
-    var year = 2014;
+    
     //meatPerYear[0][1] = année
     /* 
         d[0] = code
@@ -115,8 +120,7 @@ function ready(data, meat) {
     //meatPerYear.forEach(d => console.log(d));
     //meatPerYear.forEach(d => totalMeatPerYear[d.key] = d);
     meatPerYear.forEach(d => {
-        totalMeatPerYear[d[0]] = d,
-        //console.log(d);
+        totalMeatPerYear[d[0]] = d
     });
     //meatPerYear.forEach(function (d) { id[d.values[0].values[0].Code] = d.values[0].values[0] });
     //console.log(totalMeatPerYear['ATM'] != undefined )
@@ -136,13 +140,22 @@ function ready(data, meat) {
     var min, max = 0;
     //totalMeatPerYear.forEach(d => console.log(d));
     //interpolateOrRd / schemeOrRd
-    var hue = d3.scaleSequential(d3.interpolateOrRd).domain([0,1000,10000,250000,500000,1000000,25000000,5000000,75000000,10000000,25000000,50000000,100000000]);
+    //var hue = d3.scaleSequential(d3.interpolateOrRd).domain([0,1000,10000,20000,250000,500000,1000000,25000000,5000000,75000000,10000000,25000000,50000000,100000000]);
+    //var hue = d3.scaleSequential(d3.interpolateOrRd).domain([0,1000,25000000,5000000,75000000,10000000,25000000,50000000,100000000]);
     //var hue = d3.scaleSequential(d3.interpolateOrRd).domain([0,1000,10000,100000000]); 
-    //var hue = d3.scaleOrdinal(d3.schemeOrRd).domain([0,1000,10000,250000,500000,1000000,25000000,5000000,75000000,10000000,25000000,50000000,100000000]);
+    //var hue = d3.scaleOrdinal(d3.schemeOrRd[9]).domain([0,1000,500000,1000000,25000000,5000000,75000000,10000000,25000000,50000000,100000000]);
     //console.log([10]);
+
+    colorhue = d3.schemeOrRd[9];
+    console.log(colorhue);
+    var hue = d3.scaleLinear(d3.interpolateOrRd).domain([0,1000,10000,20000,250000,500000,1000000,25000000,5000000,75000000,10000000,25000000,50000000,100000000])
+      .range(["#eeeeee","#ffffcc","#ffeda0","#fed976","#feb24c","#fd8d3c","#fc4e2a","#f04ed3","#f03423","#7f0000","#e31a1c","d00d21","bd0026",])
+      //+ d3.schemeOrRd[9]
 
     //normalized = (x-1000)/(100000000-1000)));
 
+
+  //map
     svg.append("g")
         .attr("class", "countries")
       .selectAll("path")
@@ -151,20 +164,10 @@ function ready(data, meat) {
         .attr("d", path)
         //.style("fill", function(d) { return color(50000000); })
         .style("fill", function(d) { 
-            var total = 0 ;
-            //console.log("id = " + d.id)
-           if (totalMeatPerYear[d.id]  != undefined){
-                if (totalMeatPerYear[d.id][1].find(d => d.Year == year) != undefined){
-                    total = totalMeatPerYear[d.id][1].find(d => d.Year == year).total;
-                }
-           }
-           else total = 0;
-           var normalized = (total-1000)/(100000000-1000);
-          //console.log("total = "+ total + " normalized = "+ normalized + " hue = "+ hue(normalized));
-           return hue(normalized);}
+            return updateValue(d)}
         )
-        .style('stroke', 'white')
-        .style('stroke-width', 1.5)
+        .style('stroke', 'black')
+        .style('stroke-width', 1)
         .style("opacity",0.8)
         // tooltips
          /* .style("stroke","white")
@@ -192,56 +195,60 @@ function ready(data, meat) {
         .attr("class", "names")
         .attr("d", path);
 
+        d3.select("#timeslide").on("input", function() {
+            update(+this.value);
+        });
+        
+    var legend = d3.select("#legend")
+    .append("svg")
+    .attr("width", width)
+// Create the scale
+var x = d3.scaleLinear()
+    .domain([0, 100])         // This is what is written on the Axis: from 0 to 100
+    .range([100, 800]);       // This is where the axis is placed: from 100px to 800px
+
+// Draw the axis
+legend
+  .append("g")
+  .attr("transform", "translate(0,50)")      // This controls the vertical position of the Axis
+  .call(d3.axisBottom(x));
+
+    function updateValue(d) {
+        var total = 0
+        //console.log("id = " + d.id)
+        if (totalMeatPerYear[d.id] != undefined) {
+            if (totalMeatPerYear[d.id][1].find(d => d.Year == year) != undefined) {
+                total = totalMeatPerYear[d.id][1].find(d => d.Year == year).total
+                if(d.id == "VEN" ){
+                    //console.log(totalMeatPerYear[d.id][1][0]);
+                    console.log("total = "+ total + " normalized = "+ normalise(total) + " hue = "+ hue(normalise(total)));
+                }
+            }
+        }
+        else
+            total = 0
+        var normalized = normalise(total)
+        
+        return hue(total)
+    }
+
+        function update(value) {
+            document.getElementById("range").innerHTML=years[value];
+            year = years[value];
+            d3.selectAll("path")
+                .style("fill", updateValue);
+        };
+        
+
   }
   
-
-
-
-
-/*function dataLoaded(...args){
-    args.forEach(function(d){
-        console.log(d);
-        d.forEach(function(d){
-            d.ANMOIS = d3.timeParse("%Y%m")(d.ANMOIS)
-            d.annee = new Date(+d.annee,0)
-            //console.log(d);
-        })
-        
-    })
-}*/
-
-function dataLoaded(trajets,retards,emissions,aeroports){
-    
-    trajets.forEach(function(d){
-            d.ANMOIS = d3.timeParse("%Y%m")(d.ANMOIS)
-            d.annee = new Date(+d.annee,0)
-            //console.log(d);
-        })
-    
-    console.log(trajets);
-    
-    retards.forEach(function(d){
-            d.ANMOIS = d3.timeParse("%Y%m")(d.ANMOIS)
-            d.annee = new Date(+d.annee,0)
-            //console.log(d);
-        })
-
-    console.log(retards);
-    emissions.forEach(function(d){
-            d.ANMOIS = d3.timeParse("%Y%m")(d.ANMOIS)
-            d.annee = new Date(+d.annee,0)
-            //console.log(d);
-        })
-
-    console.log(emissions);
-    
-    aeroports.forEach(function(d){
-            d.ANMOIS = d3.timeParse("%Y%m")(d.ANMOIS)
-            d.annee = new Date(+d.annee,0)
-            //console.log(d);
-        })
-    console.log(aeroports);
+function normalise(total) {
+    return (total - 0) / (100000000 - 0)
 }
+
+
+
+
 
 
 
