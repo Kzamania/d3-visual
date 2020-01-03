@@ -35,7 +35,7 @@ var color = d3.scaleThreshold()
 
 var path = d3.geoPath();
 
-var svg = d3.select("body")
+var svg = d3.select("#map")
             .append("svg")
             .attr("width", width)
             .attr("height", height)
@@ -147,9 +147,12 @@ function ready(data, meat) {
     //console.log([10]);
 
     colorhue = d3.schemeOrRd[9];
-    console.log(colorhue);
-    var hue = d3.scaleLinear(d3.interpolateOrRd).domain([0,1000,10000,20000,250000,500000,1000000,25000000,5000000,75000000,10000000,25000000,50000000,100000000])
-      .range(["#eeeeee","#ffffcc","#ffeda0","#fed976","#feb24c","#fd8d3c","#fc4e2a","#f04ed3","#f03423","#7f0000","#e31a1c","d00d21","bd0026",])
+    //console.log(colorhue);
+    //var totalDomain = [0,1000,10000,20000,250000,500000,1000000,2500000,5000000,7500000,10000000,25000000,50000000,100000000]; 
+    var domain = [0,1000,10000,20000,250000,500000,1000000,2500000,5000000,7500000,10000000,25000000,50000000,100000000];
+    var rangeHue = ["#eeeeee","#ffffcc","#ffeda0","#fed976","#feb24c","#fd8d3c","#fc4e2a","#f03423","#e31a1c","#d00d21","#bd0026","#9f0026","#800026"]
+    var hue = d3.scaleLinear(d3.interpolateOrRd).domain(domain)
+      .range(rangeHue)
       //+ d3.schemeOrRd[9]
 
     //normalized = (x-1000)/(100000000-1000)));
@@ -202,34 +205,55 @@ function ready(data, meat) {
     var legend = d3.select("#legend")
     .append("svg")
     .attr("width", width)
+
+    var format = d3.format("~s");
+    var formatedDomain = domain.map(d => format(d) )
+    console.log(formatedDomain)
+
 // Create the scale
-var x = d3.scaleLinear()
-    .domain([0, 100])         // This is what is written on the Axis: from 0 to 100
-    .range([100, 800]);       // This is where the axis is placed: from 100px to 800px
+    var x = d3.scaleLinear()
+        .domain(formatedDomain)         // This is what is written on the Axis: from 0 to 100
+        .range(rangeHue);       // This is where the axis is placed: from 100px to 800px
+
+
 
 // Draw the axis
-legend
-  .append("g")
-  .attr("transform", "translate(0,50)")      // This controls the vertical position of the Axis
-  .call(d3.axisBottom(x));
+    legend
+        .append("g")
+        .attr("class", "legendLinear")
+        .attr("transform", "translate(20,20)");
 
+    var legendLinear = d3.legendColor()
+        .shapeWidth(50)
+        .cells(domain)
+        .labels(formatedDomain)
+        .orient('horizontal')
+        .scale(hue);
+      
+    legend.select(".legendLinear")
+        .call(legendLinear);
+    
+    function color(value){
+        if (value != 0)
+            return hue(value)
+        else 
+            return "#eeeeee";
+    }
     function updateValue(d) {
         var total = 0
         //console.log("id = " + d.id)
         if (totalMeatPerYear[d.id] != undefined) {
             if (totalMeatPerYear[d.id][1].find(d => d.Year == year) != undefined) {
                 total = totalMeatPerYear[d.id][1].find(d => d.Year == year).total
-                if(d.id == "VEN" ){
-                    //console.log(totalMeatPerYear[d.id][1][0]);
-                    console.log("total = "+ total + " normalized = "+ normalise(total) + " hue = "+ hue(normalise(total)));
-                }
+                    console.log("total = "+ total + "  hue = "+ hue(total));
             }
         }
         else
             total = 0
-        var normalized = normalise(total)
         
-        return hue(total)
+        //return hue(75000000)
+        return color(total);
+        
     }
 
         function update(value) {
