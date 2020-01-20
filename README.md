@@ -26,3 +26,7 @@ datasets: folder containing the data used
 ## Use of 
 - http://bl.ocks.org/micahstubbs/8e15870eb432a21f0bc4d3d527b2d14f
 - https://bl.ocks.org/duspviz-mit/57c15198c563f7f82f77eed0536eb78c
+- https://d3-legend.susielu.com/
+- https://www.d3-graph-gallery.com/
+- https://github.com/d3/d3-format
+- http://bl.ocks.org/mstanaland/6106487 

@@ -83,11 +83,12 @@ d3.csv("https://raw.githubusercontent.com/Kzamania/d3-visual/master/datasets/mea
 })
 
 
+var years = d3.range(1961,2015,1);
 
 function ready(data, meat) {
     let totalMeatPerYear = {};
-    var years = d3.range(1961,2015,1);
     var year = 1961;
+    var consomation = 0;
     console.log(year);
     //var id = {};
     /*let meatPerYear = d3.nest()
@@ -192,6 +193,8 @@ function ready(data, meat) {
               .style("stroke-width",0.3);
           });
   */
+
+ //timeslide
     svg.append("path")
         .datum(topojson.mesh(data.features, function(a, b) { return a.id !== b.id; }))
          // .datum(topojson.mesh(data.features, function(a, b) { return a !== b; }))
@@ -199,7 +202,9 @@ function ready(data, meat) {
         .attr("d", path);
 
         d3.select("#timeslide").on("input", function() {
+            console.log(consomation);
             update(+this.value);
+            consomation=0;
         });
         
     var legend = d3.select("#legend")
@@ -239,32 +244,40 @@ function ready(data, meat) {
         else 
             return "#eeeeee";
     }
+
+    document.getElementById("total").innerHTML = format(consomation) ;
+
     function updateValue(d) {
         var total = 0
         //console.log("id = " + d.id)
         if (totalMeatPerYear[d.id] != undefined) {
             if (totalMeatPerYear[d.id][1].find(d => d.Year == year) != undefined) {
                 total = totalMeatPerYear[d.id][1].find(d => d.Year == year).total
-                    console.log("total = "+ total + "  hue = "+ hue(total));
+                consomation = consomation + Number(total);
+                
+                //console.log("total = "+ total + "  hue = "+ hue(total));
             }
         }
         else
             total = 0
         
-        //return hue(75000000)
         return color(total);
         
     }
 
         function update(value) {
             document.getElementById("range").innerHTML=years[value];
+            
+            
             year = years[value];
             d3.selectAll("path")
                 .style("fill", updateValue);
+            document.getElementById("total").innerHTML = format(consomation) ;
+            console.log('update ' + consomation)
         };
         
-
-  }
+        
+}
   
 function normalise(total) {
     return (total - 0) / (100000000 - 0)
