@@ -1,4 +1,4 @@
-Entity,Code,Year,Meat consumption per capita (kilograms per year),GDP per capita (Rate),Total population (Gapminder)
+Entity,Code,Year,Meat,GDP,population
 Afghanistan,AFG,1800,,,3280000
 Afghanistan,AFG,1820,,,3280000
 Afghanistan,AFG,1870,,,4207000
